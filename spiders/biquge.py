@@ -1,11 +1,11 @@
 import scrapy
-from BiqugeProject.items import ChapterItem,NovelInfoItem
+from ..items import ChapterItem,NovelInfoItem
 
 
 class BiqugeSpider(scrapy.Spider):
     name = 'biquge'
     # allowed_domains = ['www.xbiquge.la']
-    start_urls = ['https://www.xbiquge.la/93/93737/']
+    start_urls = ['https://www.xbiquge.la/84/84660/']
 
     def parse(self, response):
         # 爬取小说名字和作者
@@ -29,6 +29,6 @@ class BiqugeSpider(scrapy.Spider):
         chapter_name = response.meta['chapter_name']
         chapter_order = response.meta['orderNum']
 
-        text = ''.join(response.xpath('//div[@id="content"]/text()').extract())
+        text = '\r\n'.join(response.xpath('//div[@id="content"]/text()').extract())
 
         yield ChapterItem(text=text,chapter_name=chapter_name,chapter_order=chapter_order)
