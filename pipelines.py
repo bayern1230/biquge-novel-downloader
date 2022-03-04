@@ -10,9 +10,14 @@ from .items import ChapterItem,NovelInfoItem
 import sqlite3
 import datetime
 import json
+import re
 
 class txtPipeline:
     '''写入TXT文件'''
+    def __init__(self):
+        super(txtPipeline, self).__init__()
+        self.name = ''
+        self.author = ''
 
     def open_spider(self,spider):
         self.chapter_list = []
@@ -30,20 +35,32 @@ class txtPipeline:
         return item
 
     def close_spider(self,spider):
+        # 如果没有采集到数据，则退出函数
+        if not self.name:
+            print('----------------')
+            print("没有爬取名字或作者")
+            print('----------------')
+            return
+
         # 对列表进行排序
         self.chapter_list.sort(key=lambda i:i['chapter_order'])
 
-        with open('{}  作者：{}.txt'.format(self.name,self.author),'w',encoding='utf-8') as f:
+        with open('{} - {}.txt'.format(self.name,self.author),'w',encoding='utf-8') as f:
             # 写入小说基本信息
             f.write("{} - 作者：{}".format(self.name,self.author))
-            f.write('\n')
+            f.write('\n\n\n')
 
             # 写入小说章节内容
             for i in self.chapter_list:
-                f.write(i['chapter_name'])
-                f.write('\n')
+                # 当文章标题不为数字开头时，直接写入标题
+                if not re.match(r'^\d+',i['chapter_name']):
+                    f.write(i['chapter_name'])
+                # 当文章标题为数字开头时，加上汉字标题
+                else:
+                    f.write('第%s章'%i['chapter_order']+'  '+i['chapter_name'])
+                f.write('\n\n\n')
                 f.write(i['text'])
-                f.write('\n\n')
+                f.write('\n\n\n')
 
 class jsonPipeline:
     '''写入json文件'''

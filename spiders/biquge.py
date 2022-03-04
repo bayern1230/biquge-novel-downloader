@@ -1,11 +1,22 @@
 import scrapy
 from ..items import ChapterItem,NovelInfoItem
 
+import sys
+
 
 class BiqugeSpider(scrapy.Spider):
     name = 'biquge'
     # allowed_domains = ['www.xbiquge.la']
-    start_urls = ['https://www.xbiquge.la/84/84660/']
+    # start_urls = ['https://www.xbiquge.la/95/95938/']
+
+    def start_requests(self):
+        url = getattr(self,'url',None)
+        if url:
+            self.start_urls = url
+            print('接收到了参数，参数为：',url,type(url))
+        else:
+            return
+        yield scrapy.Request(url=self.start_urls,callback=self.parse)
 
     def parse(self, response):
         # 爬取小说名字和作者
